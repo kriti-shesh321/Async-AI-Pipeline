@@ -1,0 +1,1796 @@
+{
+	"info": {
+		"_postman_id": "e440a752-832a-47e1-af75-0a54550bf08e",
+		"name": "AsyncAI Pipeline",
+		"description": "AsyncAI Pipeline is a Django REST Framework backend for submitting text-processing jobs and handling them asynchronously using Celery and Redis.\n\nThe system supports JWT authentication, job submission, job status tracking, result retrieval, retry handling, structured error history, and graceful failure states. It simulates AI-style processing tasks such as summarization, sentiment analysis, and tag generation using lightweight mock processors so the project can run locally without any third-party AI APIs.\n\nCore features:\n\n- User registration and JWT login\n    \n- Protected job APIs\n    \n- Asynchronous task execution with Celery\n    \n- Redis as Celery message broker\n    \n- Job lifecycle tracking: pending, in_progress, retrying, completed, failed\n    \n- Retry handling with structured error history\n    \n- Result retrieval after processing completes",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17086606"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"rei-sora\",\n  \"email\": \"rei@example.com\",\n  \"password\": \"qwertyuiop\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localURL}}/api/auth/register/",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register",
+								""
+							]
+						},
+						"description": "Creates a new user account and returns the created user's basic details.\n\nUse the login endpoint after registration to get access and refresh tokens."
+					},
+					"response": [
+						{
+							"name": "Register Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"username\": \"rei-sora\",\n  \"email\": \"rei@example.com\",\n  \"password\": \"qwertyuiop\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localURL}}/api/auth/register/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"register",
+										""
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sat, 16 May 2026 20:43:44 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "POST, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "56"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"username\": \"rei-sora\",\n    \"email\": \"rei@example.com\"\n}"
+						},
+						{
+							"name": "Validation Error",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"username\": \"rei-sora\",\n  \"email\": \"re.com\",\n  \"password\": \"qwertyuiop\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localURL}}/api/auth/register/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"register",
+										""
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sat, 16 May 2026 20:44:14 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "POST, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "99"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"username\": [\n        \"A user with that username already exists.\"\n    ],\n    \"email\": [\n        \"Enter a valid email address.\"\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json();",
+									"pm.collectionVariables.set(\"authToken\", response.access);",
+									"pm.collectionVariables.set(\"refreshToken\", response.refresh);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"rei-sora\",\n  \"password\": \"qwertyuiop\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localURL}}/api/auth/login/",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login",
+								""
+							]
+						},
+						"description": "Authenticates a user and returns JWT refresh and access tokens."
+					},
+					"response": [
+						{
+							"name": "Login Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"username\": \"rei-sora\",\n  \"password\": \"qwertyuiop\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localURL}}/api/auth/login/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"login",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sat, 16 May 2026 20:46:58 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "POST, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "489"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc3OTU2OTIxOCwiaWF0IjoxNzc4OTY0NDE4LCJqdGkiOiI4NWZkZGNkZDFjNDY0ZjE4YjlmMzhiNDVmZmUzNmFjYiIsInVzZXJfaWQiOiIxIn0.pt0UG4U38nPJAv5VRBvXH8-iEZCVROHaXmDVVJSeyq8\",\n    \"access\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc5MDUwODE4LCJpYXQiOjE3Nzg5NjQ0MTgsImp0aSI6IjZiNmZhZDE5ZDI3MTRhMTQ5ZDM3Yjc0M2E1OGFmZTliIiwidXNlcl9pZCI6IjEifQ.oOxUpanmHb3vMmKRGVbME3ZihE7L5-5xsxkiRZ8bKe0\"\n}"
+						},
+						{
+							"name": "Validation Error",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"rei@example.com\",\n  \"password\": \"qwertyuiop\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localURL}}/api/auth/login/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"login",
+										""
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sat, 16 May 2026 20:47:22 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "POST, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "40"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"username\": [\n        \"This field is required.\"\n    ]\n}"
+						},
+						{
+							"name": "Unauthorized Error",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"username\": \"rei-sora\",\n  \"password\": \"qweewfriop\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localURL}}/api/auth/login/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"login",
+										""
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sat, 16 May 2026 20:47:57 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "WWW-Authenticate",
+									"value": "Bearer realm=\"api\""
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "POST, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "63"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"detail\": \"No active account found with the given credentials\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Current User Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localURL}}/api/auth/me/",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"me",
+								""
+							]
+						},
+						"description": "Returns details of the currently authenticated user."
+					},
+					"response": [
+						{
+							"name": "Current User",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localURL}}/api/auth/me/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"me",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sat, 16 May 2026 20:51:25 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "56"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"username\": \"rei-sora\",\n    \"email\": \"rei@example.com\"\n}"
+						},
+						{
+							"name": "Unauthorized Error",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localURL}}/api/auth/me/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"me",
+										""
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sat, 16 May 2026 20:52:00 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "WWW-Authenticate",
+									"value": "Bearer realm=\"api\""
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "58"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"detail\": \"Authentication credentials were not provided.\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Generate New Access Token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh\": \"{{refreshToken}}\" \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localURL}}/api/auth/token/refresh/",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"token",
+								"refresh",
+								""
+							]
+						},
+						"description": "Generates a new access token using a valid refresh token."
+					},
+					"response": [
+						{
+							"name": "Refresh Access Token",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"refresh\": \"{{refreshToken}}\" \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localURL}}/api/auth/token/refresh/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"token",
+										"refresh",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sat, 16 May 2026 20:54:54 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "POST, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "244"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"access\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc5MDUxMjk0LCJpYXQiOjE3Nzg5NjQ4OTQsImp0aSI6ImFlMjI2MDUwMjE2MTRlMTliNTRhMGI4MzZkNDZmMmU1IiwidXNlcl9pZCI6IjEifQ.QW0hQo3GQgK_RwpbLcqWiaTholInUlV4iiyT7UbIGqs\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Authentication APIs for registering users, logging in with JWT, refreshing access tokens, and retrieving the currently authenticated user.",
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Jobs",
+			"item": [
+				{
+					"name": "Create New Job",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"task_type\": \"summarization\",\n  \"input_text\": \"Put simply, technology is advancing at a faster rate than anyone expected, driven by rapid progress in artificial intelligence, machine learning, and other cutting-edge domains. For example, generative AI (like Google's Gemini models) has seen a surge in development and investment, with applications that now outperform human experts in certain benchmarks and dramatically improve capabilities like programming and scientific research, within ethical reason. The pace of these advancements is reshaping industries, with AI being integrated into everything from healthcare to agriculture and route optimisation on a global scale. And it's not even creating new content yet, it's just mimicking and echoing the large sea of data that's already out there!.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localURL}}/api/jobs/",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"api",
+								"jobs",
+								""
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Job Submitted",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"task_type\": \"summarization\",\n  \"input_text\": \"Put simply, technology is advancing at a faster rate than anyone expected, driven by rapid progress in artificial intelligence, machine learning, and other cutting-edge domains. For example, generative AI (like Google's Gemini models) has seen a surge in development and investment, with applications that now outperform human experts in certain benchmarks and dramatically improve capabilities like programming and scientific research, within ethical reason. The pace of these advancements is reshaping industries, with AI being integrated into everything from healthcare to agriculture and route optimisation on a global scale. And it's not even creating new content yet, it's just mimicking and echoing the large sea of data that's already out there!.\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localURL}}/api/jobs/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"jobs",
+										""
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sun, 17 May 2026 12:30:05 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "895"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 12,\n    \"task_type\": \"summarization\",\n    \"input_text\": \"Put simply, technology is advancing at a faster rate than anyone expected, driven by rapid progress in artificial intelligence, machine learning, and other cutting-edge domains. For example, generative AI (like Google's Gemini models) has seen a surge in development and investment, with applications that now outperform human experts in certain benchmarks and dramatically improve capabilities like programming and scientific research, within ethical reason. The pace of these advancements is reshaping industries, with AI being integrated into everything from healthcare to agriculture and route optimisation on a global scale. And it's not even creating new content yet, it's just mimicking and echoing the large sea of data that's already out there!.\",\n    \"status\": \"pending\",\n    \"progress\": 0,\n    \"celery_task_id\": \"b5e5352c-e0de-422e-b06e-5dba5d9fa7ce\"\n}"
+						},
+						{
+							"name": "Invalid Task Type",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"task_type\": \"sentiment_analysis\",\n  \"input_text\": \"Put simply, technology is advancing at a faster rate than anyone expected, driven by rapid progress in artificial intelligence, machine learning, and other cutting-edge domains. For example, generative AI (like Google's Gemini models) has seen a surge in development and investment, with applications that now outperform human experts in certain benchmarks and dramatically improve capabilities like programming and scientific research, within ethical reason. The pace of these advancements is reshaping industries, with AI being integrated into everything from healthcare to agriculture and route optimisation on a global scale. And it's not even creating new content yet, it's just mimicking and echoing the large sea of data that's already out there!.\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localURL}}/api/jobs/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"jobs",
+										""
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sun, 17 May 2026 10:49:09 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "63"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"task_type\": [\n        \"\\\"sentiment_analysis\\\" is not a valid choice.\"\n    ]\n}"
+						},
+						{
+							"name": "Unauthorized Error",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"task_type\": \"summarization\",\n  \"input_text\": \"Put simply, technology is advancing at a faster rate than anyone expected, driven by rapid progress in artificial intelligence, machine learning, and other cutting-edge domains. For example, generative AI (like Google's Gemini models) has seen a surge in development and investment, with applications that now outperform human experts in certain benchmarks and dramatically improve capabilities like programming and scientific research, within ethical reason. The pace of these advancements is reshaping industries, with AI being integrated into everything from healthcare to agriculture and route optimisation on a global scale. And it's not even creating new content yet, it's just mimicking and echoing the large sea of data that's already out there!.\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localURL}}/api/jobs/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"jobs",
+										""
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sun, 17 May 2026 12:56:38 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "WWW-Authenticate",
+									"value": "Bearer realm=\"api\""
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "58"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"detail\": \"Authentication credentials were not provided.\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Job List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localURL}}/api/jobs/",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"api",
+								"jobs",
+								""
+							]
+						},
+						"description": "Returns a list of jobs submitted by the authenticated user.\n\nThis endpoint is useful for viewing all submitted jobs without loading full input/result details."
+					},
+					"response": [
+						{
+							"name": "Job List",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localURL}}/api/jobs/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"jobs",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sun, 17 May 2026 12:58:35 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "523"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 14,\n        \"task_type\": \"sentiment\",\n        \"status\": \"completed\",\n        \"progress\": 100,\n        \"retry_count\": 0,\n        \"created_at\": \"2026-05-17T12:54:37.189339Z\",\n        \"updated_at\": \"2026-05-17T12:54:47.310014Z\"\n    },\n    {\n        \"id\": 13,\n        \"task_type\": \"tag_generation\",\n        \"status\": \"failed\",\n        \"progress\": 100,\n        \"retry_count\": 3,\n        \"created_at\": \"2026-05-17T12:31:53.242903Z\",\n        \"updated_at\": \"2026-05-17T12:32:48.392477Z\"\n    },\n    {\n        \"id\": 12,\n        \"task_type\": \"summarization\",\n        \"status\": \"completed\",\n        \"progress\": 100,\n        \"retry_count\": 0,\n        \"created_at\": \"2026-05-17T12:30:04.968703Z\",\n        \"updated_at\": \"2026-05-17T12:30:15.082594Z\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Job Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localURL}}/api/jobs/12/",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"api",
+								"jobs",
+								"12",
+								""
+							]
+						},
+						"description": "Returns full details for a specific job.  \nRequires authentication. Users can only access their own jobs."
+					},
+					"response": [
+						{
+							"name": "Job Details",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localURL}}/api/jobs/12/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"jobs",
+										"12",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sun, 17 May 2026 12:57:50 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1667"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 12,\n    \"task_type\": \"summarization\",\n    \"input_text\": \"Put simply, technology is advancing at a faster rate than anyone expected, driven by rapid progress in artificial intelligence, machine learning, and other cutting-edge domains. For example, generative AI (like Google's Gemini models) has seen a surge in development and investment, with applications that now outperform human experts in certain benchmarks and dramatically improve capabilities like programming and scientific research, within ethical reason. The pace of these advancements is reshaping industries, with AI being integrated into everything from healthcare to agriculture and route optimisation on a global scale. And it's not even creating new content yet, it's just mimicking and echoing the large sea of data that's already out there!.\",\n    \"status\": \"completed\",\n    \"progress\": 100,\n    \"result\": {\n        \"summary\": \"Put simply, technology is advancing at a faster rate than anyone expected, driven by rapid progress in artificial intelligence, machine learning, and other cutting-edge domains. For example, generative AI (like Google's Gemini models) has seen a surge in development and investment, with applications that now outperform human experts in certain benchmarks and dramatically improve capabilities like programming and scientific research, within ethical reason.\",\n        \"metadata\": {\n            \"processor\": \"mock_summarizer_v1\",\n            \"sentence_count\": 4,\n            \"summary_sentence_count\": 2,\n            \"processing_time_ms\": 10030,\n            \"retries_used\": 0\n        }\n    },\n    \"latest_error_message\": null,\n    \"error_history\": [],\n    \"retry_count\": 0,\n    \"celery_task_id\": \"b5e5352c-e0de-422e-b06e-5dba5d9fa7ce\",\n    \"created_at\": \"2026-05-17T12:30:04.968703Z\",\n    \"updated_at\": \"2026-05-17T12:30:15.082594Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Job Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localURL}}/api/jobs/13/status/",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"api",
+								"jobs",
+								"13",
+								"status",
+								""
+							]
+						},
+						"description": "Returns the current processing status of a specific job.  \n  \nPossible statuses:  \n\\- pending: job created but not yet picked up  \n\\- in_progress: worker is actively processing the job  \n\\- retrying: previous attempt failed and another retry is scheduled  \n\\- completed: processing finished successfully  \n\\- failed: all retry attempts failed  \n  \nAlso returns progress, retry count, latest error message, error history, and updated timestamp.  \n  \nThis endpoint is intended for polling while the background task is running."
+					},
+					"response": [
+						{
+							"name": "Status: In Progress",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localURL}}/api/jobs/12/status/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"jobs",
+										"12",
+										"status",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sun, 17 May 2026 12:30:07 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "152"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 12,\n    \"status\": \"in_progress\",\n    \"progress\": 25,\n    \"retry_count\": 0,\n    \"latest_error_message\": null,\n    \"error_history\": [],\n    \"updated_at\": \"2026-05-17T12:30:05.062124Z\"\n}"
+						},
+						{
+							"name": "Status: Completed",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localURL}}/api/jobs/12/status/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"jobs",
+										"12",
+										"status",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sun, 17 May 2026 12:30:15 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "151"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 12,\n    \"status\": \"completed\",\n    \"progress\": 100,\n    \"retry_count\": 0,\n    \"latest_error_message\": null,\n    \"error_history\": [],\n    \"updated_at\": \"2026-05-17T12:30:15.082594Z\"\n}"
+						},
+						{
+							"name": "Status: Retrying",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localURL}}/api/jobs/13/status/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"jobs",
+										"13",
+										"status",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sun, 17 May 2026 12:32:03 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "327"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 13,\n    \"status\": \"retrying\",\n    \"progress\": 50,\n    \"retry_count\": 1,\n    \"latest_error_message\": \"Temporary processing error. Retrying...\",\n    \"error_history\": [\n        {\n            \"attempt\": 1,\n            \"stage\": \"retry_scheduled\",\n            \"message\": \"Forced failure for testing retry handling.\",\n            \"timestamp\": \"2026-05-17T12:32:03.288338+00:00\"\n        }\n    ],\n    \"updated_at\": \"2026-05-17T12:32:03.288452Z\"\n}"
+						},
+						{
+							"name": "Status: Retry Attempt In Progress",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localURL}}/api/jobs/13/status/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"jobs",
+										"13",
+										"status",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sun, 17 May 2026 12:32:26 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "472"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 13,\n    \"status\": \"in_progress\",\n    \"progress\": 25,\n    \"retry_count\": 2,\n    \"latest_error_message\": \"Temporary processing error. Retrying...\",\n    \"error_history\": [\n        {\n            \"attempt\": 1,\n            \"stage\": \"retry_scheduled\",\n            \"message\": \"Forced failure for testing retry handling.\",\n            \"timestamp\": \"2026-05-17T12:32:03.288338+00:00\"\n        },\n        {\n            \"attempt\": 2,\n            \"stage\": \"retry_scheduled\",\n            \"message\": \"Forced failure for testing retry handling.\",\n            \"timestamp\": \"2026-05-17T12:32:18.315448+00:00\"\n        }\n    ],\n    \"updated_at\": \"2026-05-17T12:32:23.336663Z\"\n}"
+						},
+						{
+							"name": "Status: Failed",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localURL}}/api/jobs/13/status/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"jobs",
+										"13",
+										"status",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sun, 17 May 2026 12:32:50 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "746"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 13,\n    \"status\": \"failed\",\n    \"progress\": 100,\n    \"retry_count\": 3,\n    \"latest_error_message\": \"Forced failure for testing retry handling.\",\n    \"error_history\": [\n        {\n            \"attempt\": 1,\n            \"stage\": \"retry_scheduled\",\n            \"message\": \"Forced failure for testing retry handling.\",\n            \"timestamp\": \"2026-05-17T12:32:03.288338+00:00\"\n        },\n        {\n            \"attempt\": 2,\n            \"stage\": \"retry_scheduled\",\n            \"message\": \"Forced failure for testing retry handling.\",\n            \"timestamp\": \"2026-05-17T12:32:18.315448+00:00\"\n        },\n        {\n            \"attempt\": 3,\n            \"stage\": \"retry_scheduled\",\n            \"message\": \"Forced failure for testing retry handling.\",\n            \"timestamp\": \"2026-05-17T12:32:33.354602+00:00\"\n        },\n        {\n            \"attempt\": 3,\n            \"stage\": \"failed\",\n            \"message\": \"Forced failure for testing retry handling.\",\n            \"timestamp\": \"2026-05-17T12:32:48.392367+00:00\"\n        }\n    ],\n    \"updated_at\": \"2026-05-17T12:32:48.392477Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Job Result",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localURL}}/api/jobs/12/result/",
+							"host": [
+								"{{localURL}}"
+							],
+							"path": [
+								"api",
+								"jobs",
+								"12",
+								"result",
+								""
+							]
+						},
+						"description": "Returns the final result for a specific job.\n\n- If the job is completed, this endpoint returns the processed result.\n    \n- If the job is still pending, in_progress, or retrying, it returns \\`result: null\\` with a message saying the result is not available yet.\n    \n- If the job failed, it returns failure information including the latest error message and error history."
+					},
+					"response": [
+						{
+							"name": "Result Available",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localURL}}/api/jobs/12/result/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"jobs",
+										"12",
+										"result",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sun, 17 May 2026 18:48:09 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "739"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 12,\n    \"status\": \"completed\",\n    \"result\": {\n        \"summary\": \"Put simply, technology is advancing at a faster rate than anyone expected, driven by rapid progress in artificial intelligence, machine learning, and other cutting-edge domains. For example, generative AI (like Google's Gemini models) has seen a surge in development and investment, with applications that now outperform human experts in certain benchmarks and dramatically improve capabilities like programming and scientific research, within ethical reason.\",\n        \"metadata\": {\n            \"processor\": \"mock_summarizer_v1\",\n            \"sentence_count\": 4,\n            \"summary_sentence_count\": 2,\n            \"processing_time_ms\": 10030,\n            \"retries_used\": 0\n        }\n    },\n    \"latest_error_message\": null,\n    \"error_history\": [],\n    \"message\": \"Result retrieved successfully.\"\n}"
+						},
+						{
+							"name": "Result Not Available Yet",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localURL}}/api/jobs/14/result/",
+									"host": [
+										"{{localURL}}"
+									],
+									"path": [
+										"api",
+										"jobs",
+										"14",
+										"result",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sun, 17 May 2026 12:54:39 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "134"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 14,\n    \"status\": \"in_progress\",\n    \"result\": null,\n    \"latest_error_message\": null,\n    \"error_history\": [],\n    \"message\": \"Result is not available yet.\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Job management APIs for submitting text-processing tasks, listing submitted jobs, checking job details, tracking processing status, and retrieving final results."
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "localURL",
+			"value": "http://localhost:8000"
+		},
+		{
+			"key": "authToken",
+			"value": ""
+		},
+		{
+			"key": "refreshToken",
+			"value": ""
+		}
+	]
+}
