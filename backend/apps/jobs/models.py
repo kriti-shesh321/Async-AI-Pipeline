@@ -31,7 +31,9 @@ class Job(models.Model):
 
     result = models.JSONField(null=True, blank=True)
 
-    error_message = models.TextField(null=True, blank=True)
+    latest_error_message = models.TextField(null=True, blank=True)
+
+    error_history = models.JSONField(default=list, blank=True)
 
     retry_count = models.PositiveSmallIntegerField(default=0)
 

@@ -6,7 +6,17 @@ from .models import Job
 class JobCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
-        fields = ["id", "task_type", "input_text"]
+        fields = [
+            "id",
+            "task_type",
+            "input_text",
+            "status",
+            "progress",
+            "celery_task_id"
+        ]
+
+        read_only_fields = ["id", "status", "progress", "celery_task_id"]
+
 
     def validate_input_text(self, value):
         cleaned_value = value.strip()
@@ -46,7 +56,8 @@ class JobDetailSerializer(serializers.ModelSerializer):
             "status",
             "progress",
             "result",
-            "error_message",
+            "latest_error_message",
+            "error_history",
             "retry_count",
             "celery_task_id",
             "created_at",
@@ -63,7 +74,8 @@ class JobStatusSerializer(serializers.ModelSerializer):
             "status",
             "progress",
             "retry_count",
-            "error_message",
+            "latest_error_message",
+            "error_history",
             "updated_at",
         ]
 
@@ -75,5 +87,6 @@ class JobResultSerializer(serializers.ModelSerializer):
             "id",
             "status",
             "result",
-            "error_message",
+            "latest_error_message",
+            "error_history",
         ]

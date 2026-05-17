@@ -11,6 +11,8 @@ from .serializers import (
     JobStatusSerializer,
 )
 
+from .tasks import process_job
+
 
 class JobListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
@@ -22,7 +24,11 @@ class JobListCreateView(generics.ListCreateAPIView):
         return JobListSerializer
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        job = serializer.save(user=self.request.user)
+        async_result = process_job.delay(job.id)
+
+        job.celery_task_id = async_result.id
+        job.save(update_fields=["celery_task_id", "updated_at"])
 
 
 class JobDetailView(generics.RetrieveAPIView):
@@ -57,7 +63,7 @@ class JobResultView(APIView):
         if job.status == Job.Status.COMPLETED:
             message = "Result retrieved successfully."
         elif job.status == Job.Status.FAILED:
-            message = "Job failed. See error_message for details."
+            message = "Job failed. See latest_error_message for details."
         else:
             message = "Result is not available yet."
 
