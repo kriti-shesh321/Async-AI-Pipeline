@@ -251,17 +251,15 @@ Expected status progression:
 
 ```txt
 pending → in_progress → retrying → in_progress → failed
-``
+```
 
 4. The status can be checked using: `GET /api/jobs/{id}/status/`
 
 5. The final failed result can be checked using: `GET /api/jobs/{id}/result/`
 
-
 ```txt
 This controlled failure trigger is only enabled in debug mode so that normal production-like usage does not accidentally fail based on user input.
 ```
-
 
 ## Limitations
 
