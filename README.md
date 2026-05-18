@@ -2,7 +2,7 @@
 
 A Django REST backend where authenticated users submit text-processing jobs and track them through an asynchronous processing pipeline. 
 
-Jobs are processed asynchronously using Celery + Redis. The system supports task status tracking, result retrieval, retry handling, and mock AI workflows for summarization and sentiment analysis.
+Jobs are processed asynchronously using Celery + Redis. The system supports task status tracking, result retrieval, retry handling, and mock AI workflows for summarization, sentiment analysis, and tag generation.
 
 ## Features
 
@@ -43,9 +43,10 @@ async-ai-pipeline/
     requirements.txt
     .env.example
   docs/                # Supporting documentation
+    EXPLANATION.md
+    AI-USAGE-NOTES.md
+    postman-collection.json
   README.md
-  EXPLANATION.md
-  AI-USAGE-NOTES.md
   .gitignore
 ```
 
@@ -79,7 +80,7 @@ Create a `.env` file inside the `backend/` directory.
 ```env
 SECRET_KEY=replace-with-your-secret-key
 DEBUG=True
-REDIS_URL=<your-redis-url>
+REDIS_URL=redis://localhost:6379/0
 ```
 
 Use `.env.example` as the safe template.
@@ -171,7 +172,7 @@ tag_generation
 ```json
 {
   "task_type": "summarization",
-  "input_text": "For example, generative AI (like Google's Gemini models) has seen a surge in development and investment, with applications that now outperform human experts in certain benchmarks and dramatically improve capabilities like programming and scientific research, within ethical reason."
+  "input_text": "For example, generative AI has seen a surge in development and investment, with applications that now outperform human experts in certain benchmarks and dramatically improve capabilities like programming and scientific research, within ethical reason."
 }
 ```
 
@@ -227,7 +228,7 @@ The APIs were manually tested using Postman for:
 
 ---
 
-### Testing retry and failure handling
+### Testing 'retry' and 'failure handling'
 
 Retry and failure handling can be tested manually using the included Postman collection.
 
@@ -246,11 +247,20 @@ Example request body:
 }
 ```
 
+Expected status progression:
+
+```txt
+pending → in_progress → retrying → in_progress → failed
+``
+
 4. The status can be checked using: `GET /api/jobs/{id}/status/`
 
 5. The final failed result can be checked using: `GET /api/jobs/{id}/result/`
 
+
+```txt
 This controlled failure trigger is only enabled in debug mode so that normal production-like usage does not accidentally fail based on user input.
+```
 
 
 ## Limitations
@@ -261,6 +271,7 @@ This controlled failure trigger is only enabled in debug mode so that normal pro
 - No frontend is included.
 - No automated test suite is included yet.
 - Celery uses one default queue.
+- Deployment is not included yet.
 
 ## Future Improvements
 
@@ -268,7 +279,7 @@ This controlled failure trigger is only enabled in debug mode so that normal pro
 - Add file upload support with cloud object storage.
 - Add real AI provider integrations.
 - Add separate queues for text/image/video jobs.
-- Add job cancellation.
+- Add manual job cancellation.
 - Add pagination and filtering.
 - Add automated tests.
 - Add frontend dashboard.
